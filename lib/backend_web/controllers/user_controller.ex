@@ -3,15 +3,15 @@ defmodule BackendWeb.UserController do
   require Logger
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    json(conn, data())
   end
 
   def show(conn, %{"id" => id}) do
     json(conn, getUsers(id))
   end
 
-  def getUsers(id) do
-    arrayOfMaps = [
+  def data do
+    [
       %{
         id: 1,
         name: "gustavo"
@@ -21,11 +21,13 @@ defmodule BackendWeb.UserController do
         name: "elixir"
       }
     ]
+  end
 
+  def getUsers(id) do
     Logger.info("Inicio")
 
     querry =
-      Enum.find(arrayOfMaps, fn
+      Enum.find(data(), fn
         elem ->
           "#{elem.id}" === "#{id}"
       end)
