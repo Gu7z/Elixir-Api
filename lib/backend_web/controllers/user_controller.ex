@@ -6,6 +6,11 @@ defmodule BackendWeb.UserController do
     json(conn, data())
   end
 
+  def create(conn, params) do
+    Logger.info(params["user"]["name"])
+    json(conn, %{success: true})
+  end
+
   def show(conn, %{"id" => id}) do
     json(conn, getUsers(id))
   end

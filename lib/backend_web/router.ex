@@ -21,6 +21,12 @@ defmodule BackendWeb.Router do
     get "/user/:id", UserController, :show
   end
 
+  scope "/api", BackendWeb do
+    pipe_through :api
+
+    resources "/users", UserController, except: [:new, :edit]
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", BackendWeb do
   #   pipe_through :api
