@@ -17,8 +17,6 @@ defmodule BackendWeb.Router do
     pipe_through :browser
 
     get "/", DocController, :index
-    get "/users", UserController, :index
-    get "/user/:id", UserController, :show
   end
 
   scope "/api", BackendWeb do

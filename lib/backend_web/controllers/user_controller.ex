@@ -1,49 +1,43 @@
 defmodule BackendWeb.UserController do
   use BackendWeb, :controller
-  require Logger
+
+  alias Backend.List
+  alias Backend.List.User
+
+  action_fallback BackendWeb.FallbackController
 
   def index(conn, _params) do
-    json(conn, data())
+    users = List.list_users()
+    render(conn, "index.json", users: users)
   end
 
-  def create(conn, params) do
-    Logger.info(params["user"]["name"])
-    json(conn, %{success: true})
+  def create(conn, %{"user" => user_params}) do
+    with {:ok, %User{} = user} <- List.create_user(user_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", Routes.user_path(conn, :show, user))
+      |> render("show.json", user: user)
+    end
   end
 
   def show(conn, %{"id" => id}) do
-    json(conn, getUsers(id))
+    user = List.get_user!(id)
+    render(conn, "show.json", user: user)
   end
 
-  def data do
-    [
-      %{
-        id: 1,
-        name: "gustavo"
-      },
-      %{
-        id: 2,
-        name: "elixir"
-      }
-    ]
+  def update(conn, %{"id" => id, "user" => user_params}) do
+    user = List.get_user!(id)
+
+    with {:ok, %User{} = user} <- List.update_user(user, user_params) do
+      render(conn, "show.json", user: user)
+    end
   end
 
-  def getUsers(id) do
-    Logger.info("Inicio")
+  def delete(conn, %{"id" => id}) do
+    user = List.get_user!(id)
 
-    querry =
-      Enum.find(data(), fn
-        elem ->
-          "#{elem.id}" === "#{id}"
-      end)
-
-    Logger.info("Querry response: #{querry[:name]}")
-
-    Logger.info("Fim")
-
-    cond do
-      querry[:name] -> %{name: querry[:name]}
-      !querry[:name] -> "Id invalido"
+    with {:ok, %User{}} <- List.delete_user(user) do
+      send_resp(conn, :no_content, "")
     end
   end
 end
